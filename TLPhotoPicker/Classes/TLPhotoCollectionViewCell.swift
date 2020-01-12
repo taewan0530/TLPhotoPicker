@@ -52,6 +52,8 @@ open class TLPhotoCollectionViewCell: UICollectionViewCell {
         }
     }
     
+    var currentIndexPath: IndexPath?
+    
     @objc open var isCameraCell = false
     
     open var duration: TimeInterval? {

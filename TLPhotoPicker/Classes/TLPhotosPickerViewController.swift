@@ -324,6 +324,10 @@ open class TLPhotosPickerViewController: UIViewController {
         }
         return false
     }
+    
+    open func resetRequest() {
+        cancelAllImageAssets()
+    }
 }
 
 // MARK: - UI & UI Action
@@ -962,12 +966,21 @@ extension TLPhotosPickerViewController: UICollectionViewDelegate,UICollectionVie
             cell.configure = self.configure
             cell.imageView?.image = self.placeholderThumbnail
             cell.liveBadgeImageView?.image = nil
+            
+            if let beforeCellIndexPath = cell.currentIndexPath,
+                let requestID = self.requestIDs[beforeCellIndexPath],
+                self.usedPrefetch == false {
+                self.photoLibrary.cancelPHImageRequest(requestID: requestID)
+                self.requestIDs.removeValue(forKey: beforeCellIndexPath)
+            }
+            
             return cell
         }
         let nibName = self.configure.nibSet?.nibName ?? "TLPhotoCollectionViewCell"
         var cell = makeCell(nibName: nibName)
         guard let collection = self.focusedCollection else { return cell }
         cell.isCameraCell = collection.useCameraButton && indexPath.section == 0 && indexPath.row == 0
+        cell.currentIndexPath = indexPath
         if cell.isCameraCell {
             if let nibName = self.configure.cameraCellNibSet?.nibName {
                 cell = makeCell(nibName: nibName)
@@ -1032,6 +1045,7 @@ extension TLPhotosPickerViewController: UICollectionViewDelegate,UICollectionVie
                         }
                     })
                     if requestID > 0 {
+
                         self.requestIDs[indexPath] = requestID
                     }
                 }
