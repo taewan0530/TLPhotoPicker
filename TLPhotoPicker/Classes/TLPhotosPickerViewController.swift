@@ -1008,7 +1008,7 @@ extension TLPhotosPickerViewController: UICollectionViewDelegate,UICollectionVie
                 options.resizeMode = .exact
                 options.isNetworkAccessAllowed = true
                 let requestID = self.photoLibrary.imageAsset(asset: phAsset, size: self.thumbnailSize, options: options) { [weak self, weak cell] (image,complete) in
-                    guard let `self` = self else { return }
+                    guard let self = self else { return }
                     DispatchQueue.main.async {
                         if self.requestIDs[indexPath] != nil {
                             cell?.imageView?.image = image
@@ -1027,27 +1027,24 @@ extension TLPhotosPickerViewController: UICollectionViewDelegate,UICollectionVie
                     self.requestIDs[indexPath] = requestID
                 }
             }else {
-                queue.async { [weak self, weak cell] in
-                    guard let `self` = self else { return }
-                    let requestID = self.photoLibrary.imageAsset(asset: phAsset, size: self.thumbnailSize, completionBlock: { (image,complete) in
-                        DispatchQueue.main.async {
-                            if self.requestIDs[indexPath] != nil {
-                                cell?.imageView?.image = image
-                                cell?.update(with: phAsset)
-                                if self.allowedVideo {
-                                    cell?.durationView?.isHidden = asset.type != .video
-                                    cell?.duration = asset.type == .video ? phAsset.duration : nil
-                                }
-                                if complete {
-                                    self.requestIDs.removeValue(forKey: indexPath)
-                                }
+                let requestID = self.photoLibrary.imageAsset(asset: phAsset, size: self.thumbnailSize, completionBlock: { [weak self, weak cell] (image, complete) in
+                    guard let self = self else { return }
+                    DispatchQueue.main.async {
+                        if self.requestIDs[indexPath] != nil {
+                            cell?.imageView?.image = image
+                            cell?.update(with: phAsset)
+                            if self.allowedVideo {
+                                cell?.durationView?.isHidden = asset.type != .video
+                                cell?.duration = asset.type == .video ? phAsset.duration : nil
+                            }
+                            if complete {
+                                self.requestIDs.removeValue(forKey: indexPath)
                             }
                         }
-                    })
-                    if requestID > 0 {
-
-                        self.requestIDs[indexPath] = requestID
                     }
+                })
+                if requestID > 0 {
+                    self.requestIDs[indexPath] = requestID
                 }
             }
             if self.allowedLivePhotos {
