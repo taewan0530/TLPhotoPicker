@@ -369,7 +369,7 @@ public struct TLAssetsCollection {
         if self.useCameraButton && index == 0 { return nil }
         let index = index - (self.useCameraButton ? 1 : 0)
         guard let result = self.fetchResult, index < result.count else { return nil }
-        return result.object(at: max(index,0))
+        return result.objectLast(at: max(index,0))
     }
     
     func getTLAsset(at indexPath: IndexPath) -> TLPHAsset? {
@@ -385,7 +385,7 @@ public struct TLAssetsCollection {
             var index = indexPath.row
             index = index - (self.useCameraButton ? 1 : 0)
             guard let result = self.fetchResult, index < result.count else { return nil }
-            return TLPHAsset(asset: result.object(at: max(index,0)))
+            return TLPHAsset(asset: result.objectLast(at: max(index, 0)))
         }
     }
     
@@ -426,5 +426,13 @@ extension UIImage {
             UIGraphicsEndImageContext()
             return result
         }
+    }
+}
+
+
+extension PHFetchResult {
+    @objc func objectLast(at index: Int) -> ObjectType {
+        let len = count - 1
+        return object(at: max(len - index, 0))
     }
 }
