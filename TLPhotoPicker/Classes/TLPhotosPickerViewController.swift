@@ -70,6 +70,7 @@ public struct TLPhotosPickerConfigure {
     public var mediaType: PHAssetMediaType? = nil
     public var numberOfColumn = 3
     public var spacing: CGFloat = 5
+    public var sectionInset: UIEdgeInsets = .zero
     public var singleSelectedMode = false
     public var maxSelectedAssets: Int? = nil
     public var fetchOption: PHFetchOptions? = nil
@@ -354,13 +355,14 @@ extension TLPhotosPickerViewController {
         }
         let count = CGFloat(self.configure.numberOfColumn)
         let spacing = self.configure.spacing
+        let sectionInset = self.configure.sectionInset
         
         let width = (self.view.frame.size.width - (spacing*(count-1))) / count
         self.thumbnailSize = CGSize(width: width, height: width)
         layout.itemSize = self.thumbnailSize
         layout.minimumLineSpacing = spacing
         layout.minimumInteritemSpacing = spacing
-        
+        layout.sectionInset = sectionInset
         self.collectionView.collectionViewLayout = layout
         
         self.placeholderThumbnail = centerAtRect(image: self.configure.placeholderIcon, rect: CGRect(x: 0, y: 0, width: width, height: width))
